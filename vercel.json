@@ -1,0 +1,6 @@
+{
+  "rootDirectory": "v1",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite"
+}
