@@ -1,6 +1,6 @@
 # BLYV Terminal
 
-BLYV Terminal is a full-stack web application for exploring Solana tokens, viewing live trades, analyzing charts, and getting AI-powered price predictions. The platform provides a terminal-style interface for users to query Solana token information in real time, with live data from BLYV and Solana Tracker APIs.
+BLYV Terminal is a modern web application for exploring Solana tokens, viewing live trades, analyzing charts, and getting AI-powered price predictions. The platform provides a terminal-style interface for users to query Solana token information in real time, with live data from BLYV and Solana Tracker APIs. All backend logic is now handled within the frontend codebase for a simplified, single-app experience.
 
 ## Features
 
@@ -9,12 +9,11 @@ BLYV Terminal is a full-stack web application for exploring Solana tokens, viewi
 - **Candlestick Charts**: Visualizes token price history using interactive candlestick charts.
 - **Clipboard Support**: Easily copy token addresses and creator addresses.
 - **Social Links**: Quick access to BLYV resources and social media.
-- **Modern Frontend**: Built with React, Tailwind CSS, and Vite for a fast, responsive UI.
-- **Express Backend**: Node.js backend handles API requests and securely manages API keys.
+- **Modern Frontend & Backend**: Built with React, Tailwind CSS, and Vite. All backend logic (API calls, key management) is handled within the frontend app using environment variables and server-side code (via Vite's proxy and serverless functions if needed).
 
 ## Demo
 
-![BLYV Terminal Screenshot](./frontend/public/screenshot.png)
+![BLYV Terminal Screenshot](v1/public/screenshot.png)
 
 ## Getting Started
 
@@ -24,63 +23,55 @@ BLYV Terminal is a full-stack web application for exploring Solana tokens, viewi
 
 ### Clone the Repository
 ```sh
-git clone https://github.com/yourusername/blyv-terminal.git
-cd blyv-terminal
+git clone https://github.com/pasindupiumal03/BLYV---vercel.git
+cd BLYV---vercel/v1
 ```
 
 ### Environment Variables
-Create a `.env` file in both the `backend` and `frontend` directories as needed. Use the provided `.env.example` as a template and **never commit your real API keys**.
+Create a `.env` file in the `v1` directory. Use the provided `.env` as a template and **never commit your real API keys**.
 
-#### Example `backend/.env.example`
+#### Example `.env`
 ```
-SOLANA_TRACKER_API_KEY=your-solana-tracker-api-key-here
-PORT=4000
+VITE_SOLANA_TRACKER_API_KEY=your-solana-tracker-api-key-here
+VITE_SOLANA_TRACKER_API_URL=https://api.solanatracker.io
 ```
 
 > **Note:** Do NOT share your real API keys publicly or commit them to version control.
 
 ### Install Dependencies
-Install backend and frontend dependencies separately:
+Install all dependencies in the unified app:
 
 ```sh
-cd backend
-npm install
-cd ../frontend
 npm install
 ```
 
 ### Running the App
-Start the backend server:
+Start the development server:
 ```sh
-cd backend
-npm start
-```
-
-Start the frontend development server:
-```sh
-cd ../frontend
 npm run dev
 ```
 
-The frontend will be available at [http://localhost:5173](http://localhost:5173) and the backend at [http://localhost:4000](http://localhost:4000).
+The app will be available at [http://localhost:5173](http://localhost:5173). All backend logic is handled internally.
 
 ## Project Structure
 ```
 BLYV v1/
-├── backend/
-│   ├── index.js
-│   ├── package.json
-│   ├── .env.example
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Terminal.jsx
-│   │   │   ├── TokenDashBoard.jsx
-│   │   ├── index.css
-│   ├── index.html
-│   ├── package.json
-│   ├── tailwind.config.js
-│   ├── vite.config.js
+├── .env
+├── index.html
+├── package.json
+├── postcss.config.js
+├── public/
+│   └── screenshot.png
+├── src/
+│   ├── App.jsx
+│   ├── components/
+│   │   ├── Terminal.jsx
+│   │   ├── TokenDashBoard.jsx
+│   │   ├── Roadmap.jsx
+│   ├── index.css
+│   ├── main.jsx
+├── tailwind.config.js
+├── vite.config.js
 ```
 
 ## Website Content
@@ -88,7 +79,7 @@ BLYV v1/
 BLYV Terminal is your gateway to the Solana ecosystem. Search tokens, analyze live market data, and visualize price trends—all in a sleek, terminal-inspired UI. Whether you're a trader, developer, or enthusiast, BLYV Terminal gives you the tools to explore and research Solana tokens with confidence.
 
 - **Instant Token Lookup**: Enter a Solana token address to get live stats, price, and chart.
-- **Secure**: Your API keys are never exposed to the browser.
+- **Secure**: Your API keys are handled via environment variables and server-side code (never commit real keys).
 - **Open Source**: Contributions are welcome!
 
 ## Contributing
