@@ -92,7 +92,7 @@ const TokenDetailsComponent = React.memo(function TokenDetailsComponent({ tokenD
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
       .then(() => alert('Copied to clipboard'))
-      .catch(err => console.error('Failed to copy: ', err));
+      .catch(err => console.error('Failed to copy'));
   };
 
   return (
@@ -101,10 +101,10 @@ const TokenDetailsComponent = React.memo(function TokenDetailsComponent({ tokenD
       <div className="bg-gray-100 p-2 flex justify-between items-center border-b border-gray-300">
         <div className="flex items-center">
           <span className="text-gray-500 text-sm mr-2">Token Address:</span>
-          <span className="text-gray-700 text-sm truncate max-w-xs">{tokenData.address}</span>
+          <span className="text-gray-700 text-sm truncate max-w-xs">{tokenData.token?.mint}</span>
         </div>
         <button
-          onClick={() => copyToClipboard(tokenData.address)}
+          onClick={() => copyToClipboard(tokenData.token?.mint)}
           className="text-blue-600 hover:text-blue-800 p-1"
         >
           <Copy size={14} />
@@ -112,8 +112,8 @@ const TokenDetailsComponent = React.memo(function TokenDetailsComponent({ tokenD
       </div>
 
       <div className="w-full h-10 m-4 flex items-center">
-        <img src={tokenData.image} alt="token-img" className="w-10 h-10" />
-        <p className="ml-5 font-bold">{tokenData.name}</p>
+        <img src={tokenData.token?.image} alt="token-img" className="w-10 h-10" />
+        <p className="ml-5 font-bold">{tokenData.token?.name}</p>
       </div>
 
       {/* Chart section */}
@@ -128,21 +128,21 @@ const TokenDetailsComponent = React.memo(function TokenDetailsComponent({ tokenD
         <div className="p-4 border-r border-gray-300">
           <div className="flex flex-col">
             <span className="text-gray-500 text-xs">Price</span>
-            <span className="text-green-600 text-lg font-bold">${tokenData.price.toFixed(6)}</span>
+            <span className="text-green-600 text-lg font-bold">${tokenData.pools?.[0].price.usd.toFixed(6)}</span>
           </div>
           <div className="flex flex-col mt-4">
             <span className="text-gray-500 text-xs">Market Cap</span>
-            <span className="text-gray-800 text-base">${(tokenData.marketCap / 1000000).toFixed(2)}M</span>
+            <span className="text-gray-800 text-base">${(tokenData.pools?.[0].marketCap?.usd / 1000000).toFixed(2)}M</span>
           </div>
           <div className="flex flex-col mt-4">
             <span className="text-gray-500 text-xs">Creator</span>
             <div className="flex items-center">
               <span className="text-gray-700 text-xs truncate max-w-xs font-bold">
-                {tokenData.creator ? tokenData.creator : "No Creator Found"}
+                {tokenData.pools?.[0].deployer ? tokenData.pools?.[0].deployer : "No Creator Found"}
               </span>
               {tokenData.creator &&
                 <button
-                  onClick={() => copyToClipboard(tokenData.creator)}
+                  onClick={() => copyToClipboard(tokenData.pools?.[0].deployer)}
                   className="text-blue-600 hover:text-blue-800 ml-2 p-1"
                 >
                   <Copy size={12} />
@@ -157,18 +157,18 @@ const TokenDetailsComponent = React.memo(function TokenDetailsComponent({ tokenD
             <span className="text-gray-500 text-xs">24h Change</span>
             <span
               className={
-                (tokenData.change24h >= 0
+                (tokenData.events?.['24h']?.priceChangePercentage >= 0
                   ? "text-green-600"
                   : "text-red-600") +
                 " text-base font-bold"
               }
             >
-              {tokenData.change24h >= 0 ? '+' : ''}{tokenData.change24h.toFixed(1)}%
+              {tokenData.events?.['24h']?.priceChangePercentage >= 0 ? '+' : ''}{tokenData.events?.['24h']?.priceChangePercentage.toFixed(1)}%
             </span>
           </div>
           <div className="flex flex-col mt-4">
             <span className="text-gray-500 text-xs">24h Volume</span>
-            <span className="text-gray-800 text-base">${(tokenData.volume24h / 1000).toFixed(2)}K</span>
+            <span className="text-gray-800 text-base">${(tokenData.pools?.[0].txns?.volume / 1000).toFixed(2)}K</span>
           </div>
         </div>
       </div>

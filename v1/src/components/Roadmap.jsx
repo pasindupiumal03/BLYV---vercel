@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import ParticlesSnow from './ParticlesSnow';
 import { 
   RocketLaunchIcon, 
   StarIcon, 
@@ -14,8 +15,9 @@ function Roadmap() {
   const navigate = useNavigate();
   
   return (
-    <div className="min-h-screen bg-white text-gray-900 flex flex-col items-center font-mono">
-      <div className="max-w-6xl w-full px-4 py-12">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col items-center font-mono relative overflow-hidden">
+      <ParticlesSnow />
+      <div className="max-w-6xl w-full px-4 py-12 relative z-[1]">
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-6 flex justify-center items-center gap-2">

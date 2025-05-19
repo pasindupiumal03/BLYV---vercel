@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { PublicKey } from '@solana/web3.js';
 import { 
   RocketLaunchIcon, 
   PaperAirplaneIcon
@@ -16,8 +17,9 @@ function BLVYTerminal() {
 }
 
 const Terminal = React.memo(function Terminal() {
-  const API_URL = import.meta.env.VITE_SOLANA_TRACKER_API_URL;
-  const API_KEY = import.meta.env.VITE_SOLANA_TRACKER_API_KEY;
+  const SOLANA_API_URL = import.meta.env.VITE_SOLANA_TRACKER_API_URL;
+  const SOLANA_API_KEY = import.meta.env.VITE_SOLANA_TRACKER_API_KEY;
+  const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
   const [input, setInput] = useState('');
   const [tokenData, setTokenData] = useState({});
@@ -25,6 +27,7 @@ const Terminal = React.memo(function Terminal() {
   const [success, setSuccess] = useState(false);
   const [solanaPrice, setSolanaPrice] = useState('');
   const [loading, setLoading] = useState(false);
+  const [formattedMsgLoaded, setFormattedMsgLoaded] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -43,95 +46,174 @@ const Terminal = React.memo(function Terminal() {
         const data = await response.json();
         setSolanaPrice(data.solana.usd);
       } catch (error) {
-        console.error('Failed to fetch Solana price:', error);
+        console.error('Failed to fetch Solana price');
       }
     };
 
     fetchSolanaPrice();
   }, []);
 
+  const formatInfoWithOpenAPI = async (info) => {
+    setFormattedMsgLoaded(false);
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          temperature: 0.7,
+          max_tokens: 300,
+          messages: [
+            {
+              role: "system",
+              content: `You are a helpful assistant limited to discussing cryptocurrencies. Use the provided token data and format it into a concise and human-friendly summary.`
+            },
+            {
+              role: "user",
+              content: `Here's the token data:\n${JSON.stringify(info, null, 2)} also use first pool from pools array`
+            },
+            {
+              role: "user",
+              content: `Format this token data using the following style:
+                        Alright, let's dive into the token data for {token_name}.
+                        The token has a market cap of {market_cap} and a 24-hour trading volume of {24h_volume}. 
+                        The price of the token is {price}, with a 24-hour change of {24h_change}.
+                        There are currently {no_of_holders} holders. The token has a risk score of {risk_score}. 
+                        Risk : {key_risk}.
+                        The token was created by {creator}, and the description reads: {description}.
+                        `
+            }
+          ]
+        })
+      });      
+  
+      const result = await response.json();
+      return result.choices?.[0]?.message?.content?.trim() || "Failed to get a response.";
+    } catch (error) {
+      setFormattedMsgLoaded(false);
+      console.error("OpenAI Error");
+      return "Failed to get a response from AI.";
+    }
+  };
+  
+
+  const fetchOpenAIResponse = async (userPrompt, tokenDetails) => {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "system",
+              content: `You are a helpful assistant limited to discussing cryptocurrencies, Solana tokens, trading, technical analysis, and blockchain technology. Do not answer unrelated questions. ${tokenDetails ? "use this token data to answer questions if needed: " + JSON.stringify(tokenDetails) : ""}`,
+            },
+            { role: "user", content: userPrompt },
+          ],
+          max_tokens: 250,
+        }),
+      });
+  
+      const result = await response.json();
+      return result.choices?.[0]?.message?.content?.trim() || "Failed to get a response.";
+    } catch (error) {
+      console.error("OpenAI Error");
+      return "Failed to get a response from AI.";
+    }
+  };  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now(), type: 'user', content: input },
-    ]);
+    const userInput = input.trim();
+    const userMessage = { id: Date.now(), type: 'user', content: userInput };
+    setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
 
+    const isLikelyTokenAddress = (input) => {
+      try {
+        new PublicKey(input);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
     try {
-      const res = await fetch(`${API_URL}/tokens/${input.trim()}`, {
-        method: 'GET',
-        headers: { 'x-api-key': API_KEY },
-      });
-      const data = await res.json();
-
-      const pool = data.pools?.[0];
-      const token = {
-        name: data.token?.name || 'Unknown',
-        address: data.token?.mint,
-        price: pool?.price?.usd || null,
-        change24h: data.events?.['24h']?.priceChangePercentage || null,
-        marketCap: pool?.marketCap?.usd || null,
-        volume24h: pool?.txns?.volume || null,
-        creator: pool?.deployer || null,
-        symbol: data.token?.symbol,
-        decimals: data.token?.decimals,
-        image: data.token?.image || null,
-      };
-
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
-      const chartRes = await fetch(`${API_URL}/chart/${input.trim()}`, {
-        method: 'GET',
-        headers: { 'x-api-key': API_KEY },
-      });
-      const chartData = await chartRes.json();
-
-      if (data.token && chartData.oclhv) {
-        setSuccess(true);
-        setTokenData(token);
-        setChartData(chartData.oclhv);
-
-        const message = (
-          `Alright, another BLYV token address: ${token.address}. Let's check this one out on the BLYV platform.\n` +
-          `Alright, let's look at ${token.address}. This is ${token.name} (${token.symbol}), the mascot of BLYV.\n` +
-          `Here's the lowdown:\n` +
-          `Market Cap: ${token.marketCap || "N/A"}\n` +
-          `24h Volume: ${token.volume24h || "N/A"}\n` +
-          `24h Change: ${token.change24h || "N/A"}%.\n` +
-          `The chart data shows some recent price action, bouncing around a bit.\n` +
-          `It's the BLYV mascot, so there's that. Volume and market cap are decent for a BLYV token, but that 24h drop in volume and market cap change is something to note. Do your own research, don't just ape in because it's the mascot.`
-        );
-
-        setMessages((prev) => [
-          ...prev,
-          { id: Date.now(), type: 'system', content: message },
-        ]);
-      } else {
+      if (isLikelyTokenAddress(userInput)) {
         setSuccess(false);
+        const res = await fetch(`${SOLANA_API_URL}/tokens/${userInput}`, {
+          method: 'GET',
+          headers: { 'x-api-key': SOLANA_API_KEY },
+        });
+
+        const token = await res.json();
+
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+
+        const chartRes = await fetch(`${SOLANA_API_URL}/chart/${userInput}`, {
+          method: 'GET',
+          headers: { 'x-api-key': SOLANA_API_KEY },
+        });
+        const chartData = await chartRes.json();
+
+        if (token.token && chartData.oclhv) {
+          setTokenData(token);
+          setChartData(chartData.oclhv);
+
+          // const systemMsg = (
+          //   `Token: ${token.name} (${token.symbol})\n` +
+          //   `Address: ${token.address}\n` +
+          //   `Price: ${token.price || "N/A"} USD\n` +
+          //   `Market Cap: ${token.marketCap || "N/A"}\n` +
+          //   `24h Volume: ${token.volume24h || "N/A"}\n` +
+          //   `24h Change: ${token.change24h || "N/A"}%\n` +
+          //   `Deployer: ${token.creator || "N/A"}`
+          // );
+
+          const aiFormmatedDetails = await formatInfoWithOpenAPI(token);
+          setMessages((prev) => [
+            ...prev,
+            { id: Date.now(), type: 'system', content: aiFormmatedDetails },
+          ]);
+          setSuccess(true);
+          setFormattedMsgLoaded(true);
+        } else {
+          setSuccess(false);
+          setMessages((prev) => [
+            ...prev,
+            { id: Date.now(), type: 'system', content: "No token found. Try a valid Solana token address." },
+          ]);
+        }
+      } else {
+        const aiMessage = await fetchOpenAIResponse(userInput, tokenData);
         setMessages((prev) => [
           ...prev,
-          { id: Date.now(), type: 'system', content: "No results found! Check the token and try again..." },
+          { id: Date.now(), type: 'system', content: aiMessage },
         ]);
       }
     } catch (err) {
       setSuccess(false);
+      setTokenData({});
+      setChartData([]);
+      console.error('Error');
       setMessages((prev) => [
         ...prev,
-        {
-          id: Date.now(),
-          type: 'system',
-          content: 'Something went wrong! Please try again...',
-        },
+        { id: Date.now(), type: 'system', content: 'An error occurred. Try again.' },
       ]);
-      console.log("eee: ", err);
     }
-
     setInput('');
     setLoading(false);
   };
+  
 
   const handleRocketClick = () => {
     window.open('/', '_blank');
@@ -214,9 +296,6 @@ const Terminal = React.memo(function Terminal() {
           ))}
         </div>
 
-        {/* Token Dashboard */}
-        {success && <TokenDashboard tokenData={tokenData} chartData={chartData} />}
-
         {/* Input */}
         <form onSubmit={handleSubmit} className="border-t border-gray-300 p-2 flex bg-white">
           <div className="text-green-500 mr-2 text-sm">{'>'}</div>
@@ -231,6 +310,24 @@ const Terminal = React.memo(function Terminal() {
             <PaperAirplaneIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </form>
+
+        {/* Token Dashboard */}
+        {(success || formattedMsgLoaded) && <TokenDashboard tokenData={tokenData} chartData={chartData} />}
+
+        {/* Input */}
+        {/* <form onSubmit={handleSubmit} className="border-t border-gray-300 p-2 flex bg-white">
+          <div className="text-green-500 mr-2 text-sm">{'>'}</div>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="flex-1 bg-transparent border-none outline-none text-gray-800 text-xs sm:text-sm"
+            placeholder="Enter command..."
+          />
+          <button type="submit" className="text-green-500 hover:text-green-600">
+            <PaperAirplaneIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+        </form> */}
       </div>
 
       {/* Loading Spinner */}
