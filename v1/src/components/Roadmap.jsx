@@ -49,7 +49,7 @@ function Roadmap() {
         <div className="relative mb-16">
           <div className="h-1 w-full bg-gray-200 absolute top-7"></div>
           <div className="flex justify-between relative">
-            <TimelineNode week={1} icon={<CheckCircleIcon className="w-6 h-6 text-white" />} completed={true} />
+            <TimelineNode week={1} icon={<CheckCircleIcon className="w-6 h-6 text-white" />} completed={true} progress={100}/>
             <TimelineNode week={2} icon="2" completed={false} progress={10} />
             <TimelineNode week={4} icon="4" completed={false} />
             <TimelineNode week={6} icon="6" completed={false} />
