@@ -138,11 +138,11 @@ const TokenDetailsComponent = React.memo(function TokenDetailsComponent({ tokenD
             <span className="text-gray-500 text-xs">Creator</span>
             <div className="flex items-center">
               <span className="text-gray-700 text-xs truncate max-w-xs font-bold">
-                {tokenData.pools?.[0].deployer ? tokenData.pools?.[0].deployer : "No Creator Found"}
+                {tokenData.token.creation?.creator ? tokenData.token.creation?.creator : "No Creator Found"}
               </span>
               {tokenData.creator &&
                 <button
-                  onClick={() => copyToClipboard(tokenData.pools?.[0].deployer)}
+                  onClick={() => copyToClipboard(tokenData.token.creation?.creator)}
                   className="text-blue-600 hover:text-blue-800 ml-2 p-1"
                 >
                   <Copy size={12} />
