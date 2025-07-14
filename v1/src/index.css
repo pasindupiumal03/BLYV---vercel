@@ -37,7 +37,7 @@ body {
   }
   
   .btn-primary {
-    @apply bg-green-500 text-white hover:bg-green-600;
+    @apply bg-orange-500 text-white hover:bg-orange-600;
   }
   
   .btn-outline {

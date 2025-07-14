@@ -7,7 +7,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        'blyv-green': '#22e060',
+        'bonk-orange': '#FFA500',
+        'bonk-primary-yellow': '#ffd302',
+        'bonk-secondary-gold': '#e89607',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

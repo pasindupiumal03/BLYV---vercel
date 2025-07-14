@@ -1,6 +1,6 @@
-# BLYV Terminal
+# BONK Terminal
 
-BLYV Terminal is a modern web application for exploring Solana tokens, viewing live trades, analyzing charts, and getting AI-powered price predictions. The platform provides a terminal-style interface for users to query Solana token information in real time, with live data from BLYV and Solana Tracker APIs. All backend logic is now handled within the frontend codebase for a simplified, single-app experience.
+BONK Terminal is a modern web application for exploring Solana tokens, viewing live trades, analyzing charts, and getting AI-powered price predictions. The platform provides a terminal-style interface for users to query Solana token information in real time, with live data from BONK and Solana Tracker APIs. All backend logic is now handled within the frontend codebase for a simplified, single-app experience.
 
 ## Features
 
@@ -9,13 +9,13 @@ BLYV Terminal is a modern web application for exploring Solana tokens, viewing l
 - **Candlestick Charts**: Visualizes token price history using interactive candlestick charts.
 - **AI Summaries & Q&A**: Get concise, human-friendly token summaries and ask crypto-related questions, powered by OpenAI GPT-3.5.
 - **Clipboard Support**: Easily copy token addresses and creator addresses.
-- **Social Links**: Quick access to BLYV resources and social media.
+- **Social Links**: Quick access to BONK resources and social media.
 - **Particles Background**: Enjoy a beautiful animated green particles background on the Roadmap page.
 - **Modern Frontend & Backend**: Built with React, Tailwind CSS, and Vite. All backend logic (API calls, key management) is handled within the frontend app using environment variables and server-side code (via Vite's proxy and serverless functions if needed).
 
 ## Demo
 
-![BLYV Terminal Screenshot](v1/public/screenshot.png)
+![BONK Terminal Screenshot](v1/public/screenshot.png)
 
 ## Getting Started
 
@@ -25,8 +25,8 @@ BLYV Terminal is a modern web application for exploring Solana tokens, viewing l
 
 ### Clone the Repository
 ```sh
-git clone https://github.com/pasindupiumal03/BLYV---vercel.git
-cd BLYV---vercel/v1
+git clone https://github.com/pasindupiumal03/BONK-Terminal.git
+cd BONK-Terminal/v1
 ```
 
 ### Environment Variables
@@ -58,7 +58,7 @@ The app will be available at [http://localhost:5173](http://localhost:5173). All
 
 ## Project Structure
 ```
-BLYV v1/
+BONK v1/
 ├── .env
 ├── index.html
 ├── package.json
@@ -79,7 +79,7 @@ BLYV v1/
 
 ## Website Content
 
-BLYV Terminal is your gateway to the Solana ecosystem. Search tokens, analyze live market data, and visualize price trends—all in a sleek, terminal-inspired UI. Enjoy AI-powered summaries and a beautiful animated particles background. Whether you're a trader, developer, or enthusiast, BLYV Terminal gives you the tools to explore and research Solana tokens with confidence.
+BONK Terminal is your gateway to the Solana ecosystem. Search tokens, analyze live market data, and visualize price trends—all in a sleek, terminal-inspired UI. Enjoy AI-powered summaries and a beautiful animated particles background. Whether you're a trader, developer, or enthusiast, BONK Terminal gives you the tools to explore and research Solana tokens with confidence.
 
 - **Instant Token Lookup**: Enter a Solana token address to get live stats, price, and chart.
 - **AI-Powered Summaries**: Get detailed, human-friendly token summaries and answers to crypto questions via OpenAI.
@@ -94,4 +94,4 @@ This project is licensed under the MIT License.
 
 ---
 
-**BLYV Terminal** — Always DYOR (Do Your Own Research)!
+**BONK Terminal** — Always DYOR (Do Your Own Research)!
